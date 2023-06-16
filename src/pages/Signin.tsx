@@ -9,11 +9,13 @@ import Logo from "../components/Logo";
 function Signin(props: any) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [newPassword, setNewPassword] = useState("");
   const [code, setCode] = useState("");
   const [forgot, setForgotStatus] = useState<boolean>(false);
+  const [Signup, setSigninStatus] = useState<boolean>(false);
   const navigate = useNavigate();
 
   function delay(ms = 1000): Promise<void> {
@@ -27,6 +29,43 @@ function Signin(props: any) {
       method: "POST",
       url: "http://127.0.0.1:3000/token",
       data: {
+        email: email,
+        password: password,
+        remember: rememberMe,
+      },
+    })
+      .then(async (response) => {
+        toast.success("Login Successful", {
+          id: toastId,
+        });
+        await delay();
+        props.setToken(response.data.access_token);
+      })
+      .catch(async (error) => {
+        if (error.response) {
+          await delay();
+          toast.error(error.response.data.msg, {
+            id: toastId,
+          });
+          if (error.response.data.msg == "Invalid Password") {
+            setPassword("");
+          } else {
+            setPassword("");
+            setEmail("");
+          }
+        }
+      });
+  }
+
+  function SignMeUp(e: any) {
+    console.log("remember me " + rememberMe);
+    const toastId = toast.loading("Please wait...");
+    e.preventDefault();
+    axios({
+      method: "POST",
+      url: "http://127.0.0.1:3000/signup",
+      data: {
+        username: userName,
         email: email,
         password: password,
         remember: rememberMe,
@@ -104,7 +143,7 @@ function Signin(props: any) {
           </div>
           <div
             className={`mt-10 bg-slate-700 shadow-xl shadow-slate-700 rounded-xl border-2 border-slate-500 ${
-              forgot ? "h-[450px]" : "h-[400px]"
+              Signup ? "h-[575px]" : "h-[500px]"
             }`}
           >
             <div className="flex justify-center">
@@ -112,7 +151,19 @@ function Signin(props: any) {
                 <h2 className="text-white cap font-bold text-center text-xl tracking-wide">
                   Sign in to your account
                 </h2>
-                {!forgot ? (
+
+                <div className="flex justify-center mt-2">
+                  <button
+                    className={
+                      "bg-blue-500 border-2 border-blue-800 text-lg px-4 py-2 mt-4 rounded-lg hover:bg-blue-700 transition-all ease-in-out duration-300"
+                    }
+                    onClick={() => setSigninStatus(!Signup)}
+                  >
+                    {!Signup ? "Sign Up" : "Sign In"}
+                  </button>
+                </div>
+
+                {!Signup ? (
                   <form onSubmit={logMeIn}>
                     <label>Email</label>
                     <input
@@ -160,7 +211,14 @@ function Signin(props: any) {
                     </div>
                   </form>
                 ) : (
-                  <form onSubmit={checkRecovery}>
+                  <form onSubmit={SignMeUp}>
+                    <label>UserName</label>
+                    <input
+                      type="text"
+                      placeholder="User Name"
+                      onChange={(e) => setUserName(e.target.value)}
+                      required
+                    />
                     <label>Email</label>
                     <input
                       type="email"
@@ -169,30 +227,43 @@ function Signin(props: any) {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
-                    <label>Recovery Code</label>
+                    <label>Password</label>
                     <input
-                      type="password"
-                      value={code}
+                      type={showPassword ? "text" : "password"}
+                      value={password}
                       placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                      onChange={(e) => setCode(e.target.value)}
+                      onChange={(e) => setPassword(e.target.value)}
                       required
                     />
-                    <label>New Password</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                    />
+                    <div className="flex justify-between mt-4">
+                      <div className="flex">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 mr-2 mt-1 accent-blue-500"
+                          onChange={(e) => setRememberMe(e.target.checked)}
+                        />
+                        <p className="text-gray-300">Remember me</p>
+                      </div>
+                      <div className="flex">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 mr-2 mt-1 accent-blue-500"
+                          onChange={() => setShowPassword(!showPassword)}
+                        />
+                        <p className="text-gray-300">
+                          {showPassword ? "Hide" : "Show"} password
+                        </p>
+                      </div>
+                    </div>
                     <button
                       type="submit"
                       className="bg-blue-500 border-2 border-blue-800 text-lg px-4 py-2 mt-4 rounded-lg w-full hover:bg-blue-700 transition-all ease-in-out duration-300"
                     >
-                      Change Password
+                      Sign Up
                     </button>
                   </form>
                 )}
+
                 <div className="flex justify-center mt-2">
                   <button
                     className={

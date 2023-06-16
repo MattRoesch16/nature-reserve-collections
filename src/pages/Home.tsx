@@ -21,7 +21,6 @@ const Home = (props: any) => {
         const res = response.data;
         res.access_token && props.setToken(res.access_token);
         setName(res.firstName);
-        setAdmin(Boolean(res.Admin));
       })
       .catch((error) => {
         if (error.response) {
@@ -71,18 +70,16 @@ const Home = (props: any) => {
             Welcome, {name}
           </div>
           <h2 className="font-roboto uppercase text-center mb-4 -mt-2 text-gray-600 font-bold text-xl tracking-wider select-none">
-            {admin ? "Admin" : "User"}
+            User
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4">
-            {admin ? (
               <a href="/team">
                 <div className={styles.container}>
                   <RiTeamFill size={iconSize} />
                   <h3 className={styles.text}>Team</h3>
                 </div>
               </a>
-            ) : null}
-            <a href="/schedule" className={!admin ? "md:col-span-2" : ""}>
+            <a href="/schedule" className="">
               <div className={styles.container}>
                 <BsCalendarFill size={iconSize} />
                 <h3 className={styles.text}>Schedule</h3>

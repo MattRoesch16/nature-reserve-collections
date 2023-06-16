@@ -29,11 +29,9 @@ const Team = (props: any) => {
         const res = response.data;
         res.access_token && props.setToken(res.access_token);
         // only load data if admin is logged in
-        if (res.Admin == true) {
-          setAccess(res.Admin);
+          setAccess(true);
           setUserID(res.ID);
           getTeam();
-        }
       })
       .catch((error) => {
         console.log(error);
